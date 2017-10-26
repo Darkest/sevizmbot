@@ -1,0 +1,16 @@
+group 'ru.darkest'
+version '0.1'
+
+apply plugin: 'scala'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.scala-lang', name: 'scala-compiler', version: '2.12.4'
+    compile 'info.mukel:telegrambot4s_2.12:3.0.9'
+    testCompile group: 'org.scalatest', name: 'scalatest_2.12', version: '3.2.0-SNAP9'
+}
