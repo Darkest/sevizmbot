@@ -1,22 +1,29 @@
+import dao.Accessor
 import info.mukel.telegrambot4s.api.declarative._
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.models._
 
 import scala.io.Source
 
-object SevIzmBot extends TelegramBot with Polling with Commands{
+object SevIzmBot extends TelegramBot with Polling with Commands {
   lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
     .getOrElse(Source.fromFile("bot.token").getLines().mkString)
 
-  def menu = Option{ReplyKeyboardMarkup(keyboard = Seq(Seq(
-      KeyboardButton("Hi") ,
+
+  def menu = Option {
+    ReplyKeyboardMarkup(keyboard = Seq(Seq(
+      KeyboardButton("Hi"),
       KeyboardButton("Bye"))),
-    resizeKeyboard = Option(true)
-  )
+      resizeKeyboard = Option(true)
+    )
   }
 
   onCommand("/start") { implicit msg =>
+    val userId = msg.from.get.id
+    val userName = msg.from.get.firstName
+
+    Accessor.registerUser(dao.User(userId, userName))
     reply("Hi!", replyMarkup = menu)
     menu
   }
