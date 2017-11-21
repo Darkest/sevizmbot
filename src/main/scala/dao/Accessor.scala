@@ -1,13 +1,25 @@
 package dao
 
 import com.typesafe.scalalogging.LazyLogging
-import config.BotConfig
 import dao.SquerylEntrypointForMyApp._
 import org.squeryl.adapters.H2Adapter
 import org.squeryl.{Session, SessionFactory}
 
 
 object Accessor extends LazyLogging {
+
+  def init() = {
+    logger.info("Starting DB Accessor")
+    val ddl: StringBuilder = new StringBuilder()
+
+    def addToDDL(s: String) = ddl.append(s"$s\n")
+
+    transaction {
+      BotSchema.printDdl
+      println("Hi!")
+    }
+    logger.debug(s"DDL for DB:\n${ddl.toString()}")
+  }
 
   import config.BotConfig.config.dbConfig._
 
@@ -18,12 +30,13 @@ object Accessor extends LazyLogging {
       new H2Adapter)
   )
 
-  if (BotConfig.config.dbConfig.dbWebServer.toLowerCase == "true") {
+  if (dbWebServer.toLowerCase == "true") {
     import org.h2.tools.Server
+    logger.info("Starting h2 web server")
     val webServer: Server = Server.createWebServer("-web", "-webPort", "8082").start
-    inTransaction {
+    /*inTransaction {
       //BotSchema.create
-    }
+    }*/
   }
 
   def registerUser(user: User) = {

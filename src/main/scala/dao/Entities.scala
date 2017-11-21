@@ -2,12 +2,12 @@ package dao
 
 import dao.Role.Role
 import dao.SquerylEntrypointForMyApp._
-import org.squeryl.Schema
+import org.squeryl.dsl.CompositeKey4
+import org.squeryl.{KeyedEntity, Schema}
 
 class User(val id: Long,
            val name: String = "",
            val role: Option[Role] = Some(Role.user)) {
-  def this() = this(0, "", Some(Role.user))
 
 }
 
@@ -17,13 +17,16 @@ object User {
 
 object BotSchema extends Schema {
   val users = table[User]
+  val addresses = table[Address]
 
   on(users)(u => declare(
-    u.id is indexed("userIdX"),
     u.role is indexed("userRoleX")
   ))
 
-  val roles = table[Role]
+  on(addresses)(adr => declare(
+    columns(adr.building, adr.house, adr.region, adr.street) are indexed,
+  ))
+
 }
 
 object Role extends Enumeration {
@@ -33,3 +36,12 @@ object Role extends Enumeration {
   val coordinator = Value(3, "coordinator")
 }
 
+class Address(val addressId: Long,
+              val city: String = "Москва",
+              val street: String,
+              val house: String,
+              val building: String = "",
+              val region: Option[String] = Some(""),
+              val doorsCount: Option[Int] = Some(0)) extends KeyedEntity[CompositeKey4[String, String, String, String]] {
+  def id = compositeKey(city, street, house, building)
+}

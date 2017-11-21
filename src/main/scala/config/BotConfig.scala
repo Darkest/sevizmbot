@@ -1,5 +1,6 @@
 package config
 
 object BotConfig {
-  val config: AppConfig = AppConfigParser.parseConfig("application.conf")
+  val config: AppConfig = AppConfigParser.parseConfig("configs/application.conf")
+
 }

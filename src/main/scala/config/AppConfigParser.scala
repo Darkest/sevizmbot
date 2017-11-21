@@ -12,9 +12,12 @@ object AppConfigParser extends LazyLogging {
   def parseConfig(confFile: File): AppConfig = {
     val conf = Try(ConfigFactory.parseFile(confFile))
     conf match {
-      case Success(parsedConfig) => new AppConfig {
-        override val dbConfig: DBConfig = DBConfigParser.parse(parsedConfig)
-      }
+      case Success(parsedConfig) =>
+        val config = new AppConfig {
+          override val dbConfig: DBConfig = DBConfigParser.parse(parsedConfig)
+        }
+        logger.info(s"Loaded configuration from file ${confFile.getAbsolutePath}")
+        config
       case Failure(exception) =>
         logger.info("Error reading config from file")
         logger.info(exception.getMessage, exception.getCause)
@@ -26,6 +29,4 @@ object AppConfigParser extends LazyLogging {
   def parseConfig(path: String): AppConfig = {
     parseConfig(new File(path))
   }
-
-
 }
