@@ -1,4 +1,5 @@
 import dao.Accessor
+import dao.Converters._
 import info.mukel.telegrambot4s.api.declarative._
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.models._
@@ -20,11 +21,11 @@ object SevIzmBot extends TelegramBot with Polling with Commands {
   }
 
   onCommand("/start") { implicit msg =>
-    val userId = msg.from.get.id
-    val userName = msg.from.get.firstName
-
-    Accessor.registerUser(dao.User(userId, userName))
-    reply("Hi!", replyMarkup = menu)
+    val user = msg.from.get
+    Accessor.registerUser(user) match {
+      case true => reply(s"Добро пожаловть, ${user.firstName}!")
+      case false => reply(s"С возвращениемь, ${user.firstName}!")
+    }
     menu
   }
 }
