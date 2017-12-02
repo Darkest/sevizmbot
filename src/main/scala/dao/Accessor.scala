@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.LazyLogging
 import slick.jdbc.H2Profile.api._
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
 object Accessor extends LazyLogging {
   import config.BotConfig.config.dbConfig._
@@ -50,5 +50,18 @@ object Accessor extends LazyLogging {
         logger.info(s"Successfully Registered new user ${user.firstName} with id=${user.id}")
         true
     }
+  }
+
+
+  def getUserRoleById(id: Long): Role = {
+    def getUserRoleByIdQuery =
+      for {
+        (u, r) <- users.filter(_.id === id) join roles
+      } yield r
+
+    logger.debug(s"Getting role for user with id $id")
+    val role = Await.result(db.run(getUserRoleByIdQuery.result.headOption), 5 second).get
+    logger.debug(s"User with id=$id has the role of ${role.role}")
+    role
   }
 }

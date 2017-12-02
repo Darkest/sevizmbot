@@ -12,6 +12,10 @@
         </encoder>
     </appender>
 
+    <logger name="slick" level="INFO">
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <root level="debug">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>

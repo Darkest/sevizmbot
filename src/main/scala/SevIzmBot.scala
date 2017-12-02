@@ -6,26 +6,49 @@ import info.mukel.telegrambot4s.models._
 
 import scala.io.Source
 
-object SevIzmBot extends TelegramBot with Polling with Commands {
+object SevIzmBot extends TelegramBot with Polling with Commands with RegexCommands {
   lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
     .getOrElse(Source.fromFile("bot.token").getLines().mkString)
 
 
-  def menu = Option {
-    ReplyKeyboardMarkup(keyboard = Seq(Seq(
-      KeyboardButton("Hi"),
-      KeyboardButton("Bye"))),
-      resizeKeyboard = Option(true)
-    )
+  def menuFromCommands(cmds: List[Command]) = {
+    val lines = scala.collection.mutable.Buffer.empty[List[KeyboardButton]]
+    for (i <- 0 to cmds.length / 3) {
+      lines += cmds.slice(0 + i * 3, 2 + i * 3).map(x => KeyboardButton(x.commandText))
+    }
+    Option(Seq(lines))
   }
 
-  onCommand("/start") { implicit msg =>
+  /*def adminMenu = {
+    val admin
+  }*/
+
+
+  /*Option {
+    ReplyKeyboardMarkup(keyboard = Seq(Seq(
+      KeyboardButton("Повысить пользователя"),
+      KeyboardButton("Понизить пользователя"))),
+      resizeKeyboard = Option(true)
+    )
+  }*/
+
+  when(onCommand("/start"), (_: Message) => true) { implicit msg =>
     val user = msg.from.get
-    Accessor.registerUser(user) match {
-      case true => reply(s"Добро пожаловть, ${user.firstName}!")
-      case false => reply(s"С возвращениемь, ${user.firstName}!")
-    }
-    menu
+    val replyPhrase =
+      Accessor.registerUser(user) match {
+        case true => s"Добро пожаловть, ${user.firstName}!"
+        case false => s"С возвращениемь, ${user.firstName}!"
+      }
+    reply(replyPhrase /*, replyMarkup = adminMenu*/)
+  }
+
+  when(onMessage, (_: Message) => true) { implicit msg =>
+    reply("123")
+
+  }
+
+  when(onMessage, (_: Message) => true) { implicit msg =>
+    reply("321")
   }
 }
